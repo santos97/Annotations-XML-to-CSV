@@ -5,22 +5,22 @@ from xml.dom import minidom
 import xml.etree.ElementTree as ET
 
 def convert_xml2yolo(file_path):
-    column_list = ['ImageID', 'source', 'width', 'height', 'ClassName', 'XMin', 'YMin', 'XMax', 'YMax']
+    column_list = ['ImageID', 'source', 'width', 'height', 'ClassName', 'XMin', 'YMin', 'XMax', 'YMax'] #add headers as per your requirement
     xml_list = []
-    fh = open(file_path,'r')
+    fh = open(file_path,'r') #file_path is path to file that contains path to each image on your system
     converted_path=[]
     #print(fname)
-    lines =fh.readlines()
+    lines =fh.readlines()   #read all the lines of the file into a list
     #print(lines[10])
     for fname in lines:
         fname_orig = fname
-        fname_orig = fname_orig.replace('.jpg', '')
+        fname_orig = fname_orig.replace('.jpg', '') #replace image with xml
         fname = fname.rstrip()
         fname = fname.replace('images','labels')
         fname = fname.replace('jpg', 'xml')
         #print(fname)
         xmldoc = minidom.parse(fname)
-        itemlist = xmldoc.getElementsByTagName('object')
+        itemlist = xmldoc.getElementsByTagName('object')    #find objects in xml files
         size = xmldoc.getElementsByTagName('size')[0]
         width = int((size.getElementsByTagName('width')[0]).firstChild.data)
         height = int((size.getElementsByTagName('height')[0]).firstChild.data)
@@ -35,7 +35,7 @@ def convert_xml2yolo(file_path):
             xmax = ((item.getElementsByTagName('bndbox')[0]).getElementsByTagName('xmax')[0]).firstChild.data
             ymax = ((item.getElementsByTagName('bndbox')[0]).getElementsByTagName('ymax')[0]).firstChild.data
             b = (float(xmin), float(xmax), float(ymin), float(ymax))
-            xml_list.append([fname_orig, 'IDD', width, height, classid, xmin, ymin, xmax, ymax])
+            xml_list.append([fname_orig, 'IDD', width, height, classid, xmin, ymin, xmax, ymax]) #SEE line 8
             #f.write(label_str + " " + " ".join([("%.6f" % a) for a in bb]) + '\n')
     xml_df = pd.DataFrame(xml_list, columns=column_list)
     xml_df.to_csv("test-annotations.csv", index=False)
@@ -45,7 +45,7 @@ def main():
     
     image_path = os.path.join(os.getcwd())
     print(image_path)
-    file_path="/media/chai-rbccps/580aa4d5-a188-47a1-b2bc-d8e1e077e349/tata/datasets/IDD/IDD_Detection/test.txt"
+    file_path="/media/chai-rbccps/580aa4d5-a188-47a1-b2bc-d8e1e077e349/tata/datasets/IDD/IDD_Detection/test.txt" 
 
     convert_xml2yolo(file_path)
     #xml_df.to_csv('data/tt_labels.csv', index=None)
